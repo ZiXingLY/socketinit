@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Socketio chat</title>
+    <script src="https://cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/socket.io/2.0.3/socket.io.js"></script>
+    <style>
+        body {
+            padding: 20px;
+        }
+        #console {
+            height: 400px;
+            overflow: auto;
+        }
+        .username-msg {
+            color: orange;
+        }
+        .connect-msg {
+            color: green;
+        }
+        .disconnect-msg {
+            color: red;
+        }
+        .send-msg {
+            color: #888
+        }
+    </style>
+</head>
+<body>
+<h1>Netty-socketio chat demo</h1>
+<br />
+<div id="console" class="well"></div>
+<form class="well form-inline" onsubmit="return false;">
+    <input id="name" class="input-xlarge" type="text" placeholder="用户名称. . . " />
+    <input id="msg" class="input-xlarge" type="text" placeholder="发送内容. . . " />
+    <button type="button" onClick="sendMessage()" class="btn">Send</button>
+    <button type="button" onClick="sendDisconnect()" class="btn">Disconnect</button>
+</form>
+</body>
+<script type="text/javascript">
+    var socket = io.connect('http://localhost:8081?user_id=1');
+    socket.on('connect',function(sever) {
+        console.log(socket);
+        output('<span class="connect-msg">连接成功!</span>');
+    });
+
+    socket.on('message', function(data) {
+        output('<span class="username-msg">' + data + '</span>');
+    });
+
+    socket.on('disconnect',function() {
+        output('<span class="disconnect-msg">断开连接! </span>');
+    });
+
+    function sendDisconnect() {
+        socket.disconnect();
+    }
+
+    function sendMessage() {
+        var userName = $("#name").val();
+        var message = $('#msg').val();
+        $('#msg').val('');
+        socket.emit('message_new', {
+            send_user_name : userName,
+            msg : message
+        });
+    }
+
+    function output(message) {
+        var currentTime = "<span class='time' >" + new Date() + "</span>";
+        var element = $("<div>" + currentTime + " " + message + "</div>");
+        $('#console').prepend(element);
+    }
+</script>
+</html>
+

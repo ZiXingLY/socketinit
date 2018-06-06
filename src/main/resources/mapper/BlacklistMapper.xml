@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qy.dao.BlacklistMapper">
+  <resultMap id="BaseResultMap" type="com.qy.model.Blacklist">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="user_id" />
+    <result column="be_pulled_black_id" jdbcType="INTEGER" property="be_pulled_black_id" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="add_time" jdbcType="VARCHAR" property="add_time" />
+  </resultMap>
+</mapper>

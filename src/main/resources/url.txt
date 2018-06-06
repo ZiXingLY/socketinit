@@ -1,0 +1,12 @@
+https://user.qzone.qq.com/proxy/domain/taotao.qq.com/cgi-bin/emotion_cgi_msgdetail_v6?qzonetoken=d42f70ba0f4e2b895e38aca9863078cf0ff316ce8a28145acb67a6109c84f91a057431ed331a66451429&g_tk=1148256331
+Request Method: POST
+
+
+tid: fe54a74eb8a8005b11310700
+uin: 1319589118
+t1_source: 1
+not_trunc_con: 1
+hostuin: 1319589118
+code_version: 1
+format: fs
+qzreferrer: https://user.qzone.qq.com/1319589118/main

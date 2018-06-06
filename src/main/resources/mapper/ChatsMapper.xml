@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qy.dao.ChatsMapper">
+  <resultMap id="BaseResultMap" type="com.qy.model.Chats">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="send_id" jdbcType="INTEGER" property="send_id" />
+    <result column="target_id" jdbcType="INTEGER" property="target_id" />
+    <result column="chats_group_id" jdbcType="INTEGER" property="chats_group_id" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="read_state" jdbcType="INTEGER" property="read_state" />
+    <result column="add_time" jdbcType="VARCHAR" property="add_time" />
+    <result column="msg" jdbcType="LONGVARCHAR" property="msg" />
+  </resultMap>
+
+
+  <!--获取两个人单聊的聊天信息-->
+  <select id="getUserChatsList" resultType="map">
+    SELECT * FROM qy_chats
+    WHERE (send_id = #{send_id} AND target_id = #{target_id})
+          OR (send_id = #{target_id} AND target_id = #{send_id} AND state = 0)
+  </select>
+  <!--批量更新未读状态-->
+  <update id="batchChangeChatsReadState">
+    UPDATE qy_chats SET read_state = 1
+    WHERE (send_id = #{send_id} AND target_id = #{target_id}  AND state = 0  AND read_state = 0)
+    OR (send_id = #{target_id} AND target_id = #{send_id} AND state = 0  AND read_state = 0)
+  </update>
+  <!--获取和用户相关的聊天列表已经最后的消息-->
+  <select id="getUserChatsGroupList" resultType="map">
+    SELECT
+      d.*,
+      m.account,
+      m.nickname,
+      m.avatar,
+      qc.no_read_num
+    FROM
+      (
+        SELECT
+          c.*
+        FROM
+          (
+            SELECT
+              *
+            FROM
+              qy_chats_group_member
+            WHERE
+              member_id = #{send_id}
+          ) AS qcgm
+          LEFT JOIN
+          (
+            SELECT
+              a.*
+            FROM
+              qy_chats AS a
+              RIGHT JOIN
+              (
+                SELECT
+                  *,
+                  MAX(add_time) AS max_add_time
+                FROM
+                  qy_chats WHERE state = 0 OR (send_id = #{send_id})
+                GROUP BY
+                  chats_group_id
+              ) AS b
+                ON
+                  a.chats_group_id = b.chats_group_id AND a.add_time = b.max_add_time
+            ORDER BY
+              a.add_time
+            DESC
+          ) AS c
+            ON
+              qcgm.chats_group_id = c.chats_group_id
+      ) AS d
+      LEFT JOIN
+      (
+        SELECT
+          *
+        FROM
+          qy_member
+        WHERE
+          id != #{send_id}
+      ) m
+        ON
+          (
+            d.send_id = m.id OR d.target_id = m.id
+            )
+      LEFT JOIN
+      (
+        SELECT
+          chats_group_id,
+          COUNT(id) AS no_read_num
+        FROM
+          qy_chats
+        WHERE
+          read_state = 0 AND send_id != #{send_id} AND state = 0
+        GROUP BY
+          chats_group_id
+      ) AS qc
+        ON
+          d.chats_group_id = qc.chats_group_id;
+  </select>
+
+  <!--获取用户的群组-->
+  <select id="getUserGroup" resultType="map">
+    SELECT a.chats_group_id FROM (SELECT * FROM qy_chats_group_member WHERE member_id = #{send_id}) AS a JOIN (SELECT * FROM qy_chats_group_member WHERE member_id = #{target_id}) AS b ON a.chats_group_id = b.chats_group_id
+  </select>
+
+</mapper>
